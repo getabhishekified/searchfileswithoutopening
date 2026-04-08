@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Search Files Without Opening — Search every file, find every word</title>
+  <meta name="description" content="Find any text inside your PDFs, Word docs, Excel sheets and more — without opening a single file. Free forever."/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:    #2563eb;
+      --blue-dk: #1d4ed8;
+      --blue-lt: #eff6ff;
+      --gray-50: #f9fafb;
+      --gray-100:#f3f4f6;
+      --gray-200:#e5e7eb;
+      --gray-400:#9ca3af;
+      --gray-600:#4b5563;
+      --gray-800:#1f2937;
+      --gray-900:#111827;
+      --green:   #16a34a;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--gray-800);
+      background: #fff;
+      line-height: 1.6;
+    }
+
+    /* ── NAV ─────────────────────────────────────────── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px;
+    }
+    .nav-logo {
+      font-weight: 700; font-size: 1rem;
+      color: var(--gray-900); letter-spacing: -.3px;
+    }
+    .nav-logo span { color: var(--blue); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      text-decoration: none; color: var(--gray-600);
+      font-size: .9rem; transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--blue); }
+    .nav-cta {
+      background: var(--blue); color: #fff;
+      padding: .45rem 1.1rem; border-radius: 6px;
+      font-size: .875rem; font-weight: 600;
+      text-decoration: none; transition: background .2s;
+    }
+    .nav-cta:hover { background: var(--blue-dk); }
+
+    /* ── HERO ────────────────────────────────────────── */
+    .hero {
+      padding: 6rem 2rem 4rem;
+      text-align: center;
+      background: linear-gradient(180deg, #f0f7ff 0%, #fff 100%);
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: .4rem;
+      background: var(--blue-lt); color: var(--blue);
+      font-size: .78rem; font-weight: 600; padding: .3rem .8rem;
+      border-radius: 999px; margin-bottom: 1.5rem;
+      border: 1px solid #bfdbfe;
+    }
+    .badge-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--green); animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; } 50% { opacity: .4; }
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 800; line-height: 1.15;
+      color: var(--gray-900); letter-spacing: -.5px;
+      max-width: 800px; margin: 0 auto .8rem;
+    }
+    .hero h1 em {
+      font-style: normal; color: var(--blue);
+    }
+    .hero p {
+      font-size: 1.15rem; color: var(--gray-600);
+      max-width: 520px; margin: 0 auto 2.5rem;
+    }
+    .hero-btns {
+      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: var(--blue); color: #fff;
+      padding: .8rem 2rem; border-radius: 8px;
+      font-size: 1rem; font-weight: 600;
+      text-decoration: none; transition: background .2s, transform .15s;
+      box-shadow: 0 4px 14px rgba(37,99,235,.35);
+    }
+    .btn-primary:hover { background: var(--blue-dk); transform: translateY(-1px); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: #fff; color: var(--gray-700);
+      padding: .8rem 2rem; border-radius: 8px;
+      font-size: 1rem; font-weight: 500;
+      text-decoration: none; border: 1.5px solid var(--gray-200);
+      transition: border-color .2s;
+    }
+    .btn-secondary:hover { border-color: var(--blue); color: var(--blue); }
+    .free-note {
+      margin-top: 1rem; font-size: .82rem; color: var(--gray-400);
+    }
+    .free-note strong { color: var(--green); }
+
+    /* ── MOCK APP WINDOW ────────────────────────────── */
+    .hero-preview {
+      margin: 3.5rem auto 0;
+      max-width: 760px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0,0,0,.15);
+      border: 1px solid var(--gray-200);
+    }
+    .window-bar {
+      background: #1e1e2e;
+      padding: .6rem 1rem;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .dot { width: 11px; height: 11px; border-radius: 50%; }
+    .dot-red   { background: #ff5f57; }
+    .dot-yellow{ background: #febc2e; }
+    .dot-green { background: #28c840; }
+    .window-title {
+      flex: 1; text-align: center;
+      color: #6b7280; font-size: .8rem;
+    }
+    .window-body {
+      background: #1a1b2e;
+      padding: 1.5rem;
+      font-family: "Segoe UI", sans-serif;
+    }
+    .app-header-text {
+      color: #e5e7eb; font-size: 1.3rem;
+      font-weight: 700; margin-bottom: 1.2rem;
+    }
+    .app-row {
+      display: flex; align-items: center; gap: .6rem;
+      margin-bottom: .75rem;
+    }
+    .app-label {
+      color: #9ca3af; font-size: .82rem; width: 130px; flex-shrink: 0;
+    }
+    .app-input {
+      flex: 1; background: #2d2d44; border: 1px solid #3d3d5c;
+      border-radius: 6px; padding: .45rem .8rem;
+      color: #e5e7eb; font-size: .85rem;
+    }
+    .app-btn-browse {
+      background: #3b82f6; color: #fff; border: none;
+      padding: .45rem .9rem; border-radius: 6px;
+      font-size: .82rem; cursor: pointer; font-weight: 600;
+    }
+    .app-btn-search {
+      background: #1f6aa5; color: #fff; border: none;
+      padding: .45rem .9rem; border-radius: 6px;
+      font-size: .82rem; cursor: pointer; font-weight: 600;
+    }
+    .app-progress-bar {
+      height: 4px; background: #3b82f6; border-radius: 2px;
+      width: 72%; margin-bottom: .75rem;
+    }
+    .app-status {
+      color: #6b7280; font-size: .78rem; margin-bottom: 1rem;
+    }
+    .result-card {
+      background: #23243a; border: 1px solid #3d3d5c;
+      border-radius: 8px; padding: .9rem 1rem;
+      margin-bottom: .65rem;
+    }
+    .result-filename {
+      color: #e5e7eb; font-weight: 600; font-size: .88rem;
+      margin-bottom: .3rem;
+    }
+    .result-snippet {
+      color: #3b82f6; font-size: .8rem; margin-bottom: .25rem;
+    }
+    .result-path {
+      color: #4b5563; font-size: .75rem;
+    }
+
+    /* ── STATS ───────────────────────────────────────── */
+    .stats {
+      padding: 3rem 2rem;
+      background: var(--gray-900);
+      display: flex; justify-content: center; flex-wrap: wrap; gap: 3rem;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-size: 2rem; font-weight: 800; color: #fff;
+    }
+    .stat-num span { color: var(--blue); }
+    .stat-label {
+      color: var(--gray-400); font-size: .85rem; margin-top: .2rem;
+    }
+
+    /* ── FEATURES ────────────────────────────────────── */
+    .section { padding: 5rem 2rem; }
+    .section-inner { max-width: 1080px; margin: 0 auto; }
+    .section-tag {
+      display: inline-block;
+      color: var(--blue); font-weight: 700; font-size: .8rem;
+      letter-spacing: .08em; text-transform: uppercase;
+      margin-bottom: .6rem;
+    }
+    .section-title {
+      font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800;
+      color: var(--gray-900); margin-bottom: .6rem; letter-spacing: -.3px;
+    }
+    .section-sub {
+      color: var(--gray-600); font-size: 1rem;
+      max-width: 540px; margin-bottom: 3rem;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .feature-card {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: 12px; padding: 1.6rem;
+      transition: box-shadow .2s, transform .2s;
+    }
+    .feature-card:hover {
+      box-shadow: 0 8px 24px rgba(0,0,0,.08);
+      transform: translateY(-2px);
+    }
+    .feature-icon {
+      font-size: 2rem; margin-bottom: .8rem; display: block;
+    }
+    .feature-title {
+      font-size: 1rem; font-weight: 700;
+      color: var(--gray-900); margin-bottom: .4rem;
+    }
+    .feature-desc {
+      font-size: .9rem; color: var(--gray-600); line-height: 1.6;
+    }
+
+    /* ── FILE TYPES ──────────────────────────────────── */
+    .formats { background: var(--blue-lt); }
+    .formats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+    }
+    .format-pill {
+      background: #fff; border: 1.5px solid #bfdbfe;
+      border-radius: 10px; padding: 1.1rem 1rem;
+      text-align: center;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .format-pill:hover {
+      border-color: var(--blue);
+      box-shadow: 0 4px 12px rgba(37,99,235,.12);
+    }
+    .format-ext {
+      font-size: 1.3rem; font-weight: 800;
+      color: var(--blue); letter-spacing: .5px;
+    }
+    .format-name {
+      font-size: .78rem; color: var(--gray-600); margin-top: .2rem;
+    }
+
+    /* ── HOW IT WORKS ────────────────────────────────── */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 2rem;
+    }
+    .step { text-align: center; }
+    .step-num {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--blue); color: #fff;
+      font-size: 1.2rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+    }
+    .step-title {
+      font-weight: 700; font-size: 1rem;
+      color: var(--gray-900); margin-bottom: .4rem;
+    }
+    .step-desc { font-size: .9rem; color: var(--gray-600); }
+
+    /* ── FREE FOREVER ────────────────────────────────── */
+    .free-section {
+      background: var(--gray-900);
+      padding: 5rem 2rem; text-align: center;
+    }
+    .free-section h2 {
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      font-weight: 800; color: #fff; margin-bottom: .8rem;
+    }
+    .free-section h2 span { color: var(--green); }
+    .free-section p {
+      color: var(--gray-400); font-size: 1rem;
+      max-width: 480px; margin: 0 auto 2rem;
+    }
+    .perks {
+      display: flex; gap: 2rem;
+      justify-content: center; flex-wrap: wrap;
+      margin-bottom: 2.5rem;
+    }
+    .perk {
+      display: flex; align-items: center; gap: .5rem;
+      color: #d1d5db; font-size: .9rem;
+    }
+    .perk-check {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--green); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; font-weight: 700; flex-shrink: 0;
+    }
+
+    /* ── FOOTER ──────────────────────────────────────── */
+    footer {
+      background: #0d0e1a;
+      padding: 2rem; text-align: center;
+      color: var(--gray-400); font-size: .85rem;
+    }
+    footer a { color: var(--gray-400); text-decoration: none; }
+    footer a:hover { color: #fff; }
+
+    /* ── RESPONSIVE ──────────────────────────────────── */
+    @media (max-width: 640px) {
+      nav { padding: 0 1rem; }
+      .nav-links { display: none; }
+      .hero { padding: 4rem 1.2rem 3rem; }
+      .section { padding: 3.5rem 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Search<span>Files</span>WithoutOpening</div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#formats">File Types</a></li>
+    <li><a href="#how">How it works</a></li>
+  </ul>
+  <a href="#download" class="nav-cta">⬇ Free Download</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="badge">
+    <span class="badge-dot"></span>
+    Free Forever &nbsp;·&nbsp; Windows
+  </div>
+  <h1>Search every file,<br/><em>find every word</em></h1>
+  <p>Stop opening files one by one. Type a word and instantly find it inside every PDF, Word doc, Excel sheet, and more — in seconds.</p>
+  <div class="hero-btns">
+    <a href="#download" class="btn-primary">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download for Windows
+    </a>
+    <a href="#how" class="btn-secondary">
+      See how it works →
+    </a>
+  </div>
+  <p class="free-note"><strong>100% Free</strong> · No signup · No ads · No limits</p>
+
+  <!-- Mock App Window -->
+  <div class="hero-preview">
+    <div class="window-bar">
+      <span class="dot dot-red"></span>
+      <span class="dot dot-yellow"></span>
+      <span class="dot dot-green"></span>
+      <span class="window-title">Search Files Without Opening</span>
+    </div>
+    <div class="window-body">
+      <div class="app-header-text">File Search</div>
+      <div class="app-row">
+        <span class="app-label">Search Directory:</span>
+        <span class="app-input">C:\Users\Documents\Projects</span>
+        <button class="app-btn-browse">Browse</button>
+      </div>
+      <div class="app-row">
+        <span class="app-label">Search Term:</span>
+        <span class="app-input">quarterly revenue</span>
+        <button class="app-btn-search">Search</button>
+      </div>
+      <div class="app-progress-bar"></div>
+      <div class="app-status">[ 72%]  C:\Documents\Projects\Q4_Report.pdf</div>
+      <div class="result-card">
+        <div class="result-filename">📄 Q4_Report.pdf</div>
+        <div class="result-snippet">Match: "...quarterly revenue increased by 24% in..."</div>
+        <div class="result-path">C:\Documents\Projects\Q4_Report.pdf</div>
+      </div>
+      <div class="result-card">
+        <div class="result-filename">📊 Budget_2024.xlsx</div>
+        <div class="result-snippet">Match: "...quarterly revenue projections for FY24..."</div>
+        <div class="result-path">C:\Documents\Finance\Budget_2024.xlsx</div>
+      </div>
+      <div class="result-card">
+        <div class="result-filename">📝 Meeting_Notes.docx</div>
+        <div class="result-snippet">Match: "...discussed quarterly revenue targets with..."</div>
+        <div class="result-path">C:\Documents\Meetings\Meeting_Notes.docx</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <div class="stat-num">4<span>+</span></div>
+    <div class="stat-label">File formats supported</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num"><span>∞</span></div>
+    <div class="stat-label">Files you can search</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">0<span>$</span></div>
+    <div class="stat-label">Cost. Forever.</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">1<span>×</span></div>
+    <div class="stat-label">Click to open any result</div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="section-inner">
+    <span class="section-tag">Features</span>
+    <h2 class="section-title">Everything you need to find anything</h2>
+    <p class="section-sub">Built for people who deal with lots of files and hate wasting time opening each one.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">⚡</span>
+        <div class="feature-title">Real-time results</div>
+        <div class="feature-desc">Results appear as each file is scanned — no waiting for a full search to finish before you see matches.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📂</span>
+        <div class="feature-title">Entire folder search</div>
+        <div class="feature-desc">Point it at any folder — it walks through every subfolder and file automatically. Nothing gets missed.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🖱️</span>
+        <div class="feature-title">Click to open</div>
+        <div class="feature-desc">Click any result to instantly open that file in its native app. No copying paths, no hunting in Explorer.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔍</span>
+        <div class="feature-title">Exact text matching</div>
+        <div class="feature-desc">Searches for the exact phrase you type, so results are precise and relevant — not flooded with false positives.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">⏹️</span>
+        <div class="feature-title">Stop anytime</div>
+        <div class="feature-desc">Already found what you need? Hit Stop and the search halts instantly, keeping all results already found.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🌙</span>
+        <div class="feature-title">Clean dark UI</div>
+        <div class="feature-desc">A modern, distraction-free dark interface that's easy on the eyes during long search sessions.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FILE FORMATS -->
+<section class="section formats" id="formats">
+  <div class="section-inner">
+    <span class="section-tag">File Types</span>
+    <h2 class="section-title">Searches inside all your files</h2>
+    <p class="section-sub">Works across every common document format you actually use at work.</p>
+    <div class="formats-grid">
+      <div class="format-pill">
+        <div class="format-ext">PDF</div>
+        <div class="format-name">PDF Documents</div>
+      </div>
+      <div class="format-pill">
+        <div class="format-ext">DOCX</div>
+        <div class="format-name">Word Documents</div>
+      </div>
+      <div class="format-pill">
+        <div class="format-ext">XLSX</div>
+        <div class="format-name">Excel Spreadsheets</div>
+      </div>
+      <div class="format-pill">
+        <div class="format-ext">TXT</div>
+        <div class="format-name">Plain Text Files</div>
+      </div>
+      <div class="format-pill">
+        <div class="format-ext">PY JS</div>
+        <div class="format-name">Code Files</div>
+      </div>
+      <div class="format-pill">
+        <div class="format-ext">+ more</div>
+        <div class="format-name">Any text-based file</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how">
+  <div class="section-inner">
+    <span class="section-tag">How it works</span>
+    <h2 class="section-title">Three steps. That's it.</h2>
+    <p class="section-sub">No account. No setup. No configuration. Just open and search.</p>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-title">Pick a folder</div>
+        <div class="step-desc">Click Browse and select the folder you want to search. It will scan all subfolders too.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-title">Type your search term</div>
+        <div class="step-desc">Enter any word or phrase you're looking for. Exact matching means sharp, accurate results.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-title">Click a result to open it</div>
+        <div class="step-desc">Results appear in real time. Click any result to instantly open that file right where the match is.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FREE FOREVER / DOWNLOAD -->
+<section class="free-section" id="download">
+  <h2>Free <span>forever</span>. No catch.</h2>
+  <p>No subscription. No trial period. No nag screens. Just a useful tool — yours to keep and share.</p>
+  <div class="perks">
+    <div class="perk"><span class="perk-check">✓</span> No account needed</div>
+    <div class="perk"><span class="perk-check">✓</span> No ads</div>
+    <div class="perk"><span class="perk-check">✓</span> No internet required</div>
+    <div class="perk"><span class="perk-check">✓</span> Works offline</div>
+    <div class="perk"><span class="perk-check">✓</span> Share with anyone</div>
+  </div>
+  <a href="FileFinder.exe" class="btn-primary" style="font-size:1.1rem; padding: 1rem 2.5rem;">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Download for Windows — Free
+  </a>
+  <p style="margin-top:.9rem; color:#6b7280; font-size:.82rem;">Windows 10 / 11 · 64-bit · No installation required</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p style="margin-bottom:.4rem;">
+    © 2026 searchfileswithoutopening.com &nbsp;·&nbsp;
+    <a href="#">Privacy</a> &nbsp;·&nbsp;
+    <a href="#">Contact</a>
+  </p>
+  <p style="color:#374151;">Made with ❤️ for people who work with files</p>
+</footer>
+
+</body>
+</html>
