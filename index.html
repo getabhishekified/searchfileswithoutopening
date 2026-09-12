@@ -373,8 +373,28 @@
     }
     .copy-upi:hover { background: #dbeafe; }
 
+
+    /* ── AD PLACEMENTS ───────────────────────────────── */
+    .ad-slot {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      overflow: hidden;
+      margin: 2rem auto;
+    }
+    .ad-slot-728 { min-height: 90px; }
+    .ad-slot-300 { min-height: 250px; }
+    .ad-slot-native { min-height: 120px; }
+    .ad-slot-320 { display: none; min-height: 50px; }
+    .desktop-ad { display: flex; }
+    .mobile-ad { display: none; }
+
     /* ── RESPONSIVE ──────────────────────────────────── */
     @media (max-width: 640px) {
+      .desktop-ad { display: none; }
+      .mobile-ad { display: flex; }
+      .ad-slot-320 { display: flex; }
       nav { padding: 0 1rem; }
       .nav-links { display: none; }
       .hero { padding: 4rem 1.2rem 3rem; }
@@ -458,6 +478,34 @@
   </div>
 </section>
 
+<!-- 728x90 DESKTOP AD -->
+<div class="ad-slot ad-slot-728 desktop-ad" aria-label="Advertisement">
+  <script>
+    atOptions = {
+      'key' : '2e858863db96f1894ed2a75b50e8838c',
+      'format' : 'iframe',
+      'height' : 90,
+      'width' : 728,
+      'params' : {}
+    };
+  </script>
+  <script src="https://www.highrevenueformat.com/2e858863db96f1894ed2a75b50e8838c/invoke.js"></script>
+</div>
+
+<!-- 320x50 MOBILE AD -->
+<div class="ad-slot ad-slot-320 mobile-ad" aria-label="Advertisement">
+  <script>
+    atOptions = {
+      'key' : 'c1b8d6d56ef83d4b6e9fcb980793db',
+      'format' : 'iframe',
+      'height' : 50,
+      'width' : 320,
+      'params' : {}
+    };
+  </script>
+  <script src="https://www.highrevenueformat.com/c1b8d6d56ef83d4b6b6e9fcb980793db/invoke.js"></script>
+</div>
+
 <!-- FEATURES -->
 <section class="section" id="features">
   <div class="section-inner">
@@ -499,6 +547,12 @@
   </div>
 </section>
 
+<!-- NATIVE BANNER AD -->
+<div class="ad-slot ad-slot-native" aria-label="Advertisement">
+  <script async="async" data-cfasync="false" src="https://pl31304551.profitableratecpmnetwork.com/2dde923972815e3b27dcc249e61781a7/invoke.js"></script>
+  <div id="container-2dde923972815e3b27dcc249e61781a7"></div>
+</div>
+
 <!-- FILE FORMATS -->
 <section class="section formats" id="formats">
   <div class="section-inner">
@@ -533,6 +587,20 @@
     </div>
   </div>
 </section>
+
+<!-- 300x250 AD -->
+<div class="ad-slot ad-slot-300" aria-label="Advertisement">
+  <script>
+    atOptions = {
+      'key' : '64188e0c55d4ddbdf6763677c7cddf7e',
+      'format' : 'iframe',
+      'height' : 250,
+      'width' : 300,
+      'params' : {}
+    };
+  </script>
+  <script src="https://www.highrevenueformat.com/64188e0c55d4ddbdf6763677c7cddf7e/invoke.js"></script>
+</div>
 
 <!-- HOW IT WORKS -->
 <section class="section" id="how">
@@ -583,8 +651,7 @@
   <p>No subscription. No trial period. No nag screens. Just a useful tool — yours to keep and share.</p>
   <div class="perks">
     <div class="perk"><span class="perk-check">✓</span> No account needed</div>
-    <div class="perk"><span class="perk-check">✓</span> No ads</div>
-    <div class="perk"><span class="perk-check">✓</span> No internet required</div>
+        <div class="perk"><span class="perk-check">✓</span> No internet required</div>
     <div class="perk"><span class="perk-check">✓</span> Works offline</div>
     <div class="perk"><span class="perk-check">✓</span> Share with anyone</div>
   </div>
@@ -619,5 +686,9 @@ function copyUPI() {
   });
 }
 </script>
+
+<!-- SOCIAL BAR AD -->
+<script src="https://pl31304549.profitableratecpmnetwork.com/27/10/2b/27102b2c51a4aff873f25e8e63e80708.js"></script>
+
 </body>
 </html>
